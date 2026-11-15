@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Future - Luxury Store & Catalog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #09090b; /* Jet Black Theme */
+            color: #f5f5f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        .gold-text { color: #d97706; } /* Luxury Dark Golden */
+        .gold-bg { background-color: #b45309; }
+        .gold-border { border-color: #d97706; }
+        
+        /* Custom Tab Transition Effect */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+        /* Mouse Click Circle Animation Effect */
+        .click-circle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d97706;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: ping-grow 0.5s ease-out forwards;
+            z-index: 9999;
+        }
+        @keyframes ping-grow {
+            0% { width: 10px; height: 10px; opacity: 1; }
+            100% { width: 60px; height: 60px; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Header & Navigation -->
+    <header class="bg-black border-b border-amber-900/50 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wider gold-text flex items-center gap-2">
+                <i class="fa-solid fa-crown"></i> GROW FUTURE
+            </h1>
+            <nav class="flex gap-2 sm:gap-3">
+                <button onclick="switchTab('store')" id="btn-store" class="px-3 py-1.5 gold-bg text-white rounded-lg font-medium transition text-xs sm:text-sm">Store</button>
+                <button onclick="switchTab('cart')" id="btn-cart" class="px-3 py-1.5 bg-neutral-900 hover:bg-amber-800 rounded-lg font-medium transition text-xs sm:text-sm relative border border-amber-900/40">Cart <span id="cart-count" class="bg-amber-600 text-white text-[10px] px-1.5 py-0.2 rounded-full">0</span></button>
+                <button onclick="switchTab('admin')" id="btn-admin" class="px-3 py-1.5 bg-neutral-900 hover:bg-amber-800 rounded-lg font-medium transition text-xs sm:text-sm border border-amber-900/40">Admin</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Luxury Hero Slideshow Banner -->
+    <div class="bg-gradient-to-r from-black via-amber-950/30 to-black border-b border-amber-900/30 py-6 px-4 text-center relative overflow-hidden">
+        <div class="max-w-xl mx-auto">
+            <div id="slider-container" class="mb-4 rounded-xl overflow-hidden shadow-2xl border border-amber-900/50 h-56 sm:h-72 relative">
+                <!-- Slides injected dynamically -->
+            </div>
+            <h2 class="text-2xl font-extrabold gold-text mb-1">Grow Future - Luxury Collection</h2>
+            <p class="text-gray-400 text-xs sm:text-sm">Delivery all over Pakistan only (Cash on Delivery Available).</p>
+            <div class="flex justify-center gap-4 mt-3 text-lg">
+                <a href="https://tiktok.com" target="_blank" class="text-gray-300 hover:text-amber-500 transition"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="https://facebook.com" target="_blank" class="text-gray-300 hover:text-amber-500 transition"><i class="fa-brands fa-facebook"></i></a>
+                <a href="https://instagram.com" target="_blank" class="text-gray-300 hover:text-amber-500 transition"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://wa.me/923028372072" target="_blank" class="text-green-500 hover:text-green-400 transition"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- Store Tab -->
+        <section id="tab-store" class="tab-content active">
+            <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 class="text-xl font-semibold border-l-4 gold-border pl-3">Product Catalog</h3>
+                <input type="text" id="search-box" placeholder="Search luxury products..." onkeyup="renderStore()" class="bg-neutral-900 border border-amber-900/50 px-4 py-2 rounded-lg text-sm w-full sm:w-72 focus:outline-none focus:border-amber-500">
+            </div>
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Products injected dynamically -->
+            </div>
+        </section>
+
+        <!-- Cart Tab -->
+        <section id="tab-cart" class="tab-content">
+            <h3 class="text-xl font-semibold mb-4 border-l-4 gold-border pl-3">Shopping Cart & Checkout</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+                    <div id="cart-items-list" class="divide-y divide-neutral-800"></div>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 h-fit">
+                    <h4 class="font-bold text-lg mb-4 gold-text">Order Summary (Pakistan Only)</h4>
+                    <div class="space-y-2 text-sm mb-4">
+                        <div class="flex justify-between"><span>Subtotal:</span> <span id="cart-subtotal">Rs 0</span></div>
+                        <div class="flex justify-between"><span>Delivery Charges (PK):</span> <span>Rs 250</span></div>
+                        <div class="flex justify-between font-bold text-base border-t border-neutral-800 pt-2"><span>Total:</span> <span id="cart-total">Rs 250</span></div>
+                    </div>
+                    <form onsubmit="checkoutOrder(event)" class="space-y-3">
+                        <input type="text" id="cust-name" placeholder="Full Name" required class="w-full bg-neutral-950 border border-neutral-800 rounded p-2 text-sm focus:outline-none focus:border-amber-600">
+                        <input type="text" id="cust-phone" placeholder="Phone Number (e.g., 03001234567)" required class="w-full bg-neutral-950 border border-neutral-800 rounded p-2 text-sm focus:outline-none focus:border-amber-600">
+                        <textarea id="cust-address" placeholder="Complete Address (City, Province - Pakistan)" required class="w-full bg-neutral-950 border border-neutral-800 rounded p-2 text-sm focus:outline-none focus:border-amber-600"></textarea>
+                        <button type="submit" class="w-full gold-bg hover:bg-amber-600 text-white font-medium py-2 rounded transition shadow">Place Order (COD)</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Panel Tab -->
+        <section id="tab-admin" class="tab-content">
+            <div class="bg-neutral-900 border border-amber-900/40 rounded-xl p-6 shadow-lg mb-8 max-w-xl mx-auto">
+                <h3 id="form-title" class="text-xl font-bold mb-4 gold-text border-b border-neutral-800 pb-2">Add New Product</h3>
+                <form id="product-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="edit-index">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Product Name</label>
+                        <input type="text" id="prod-name" required class="w-full bg-neutral-950 border border-neutral-800 rounded px-4 py-2 text-sm focus:outline-none focus:border-amber-600">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Price (Rs)</label>
+                            <input type="number" id="prod-price" required class="w-full bg-neutral-950 border border-neutral-800 rounded px-4 py-2 text-sm focus:outline-none focus:border-amber-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Discount Price (Rs)</label>
+                            <input type="number" id="prod-disc" class="w-full bg-neutral-950 border border-neutral-800 rounded px-4 py-2 text-sm focus:outline-none focus:border-amber-600">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Product Image (Select from Mobile Gallery)</label>
+                        <input type="file" id="prod-image" accept="image/*" class="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-2 text-sm file:mr-4 file:py-1 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-800 cursor-pointer">
+                    </div>
+                    <button type="submit" class="w-full gold-bg hover:bg-amber-600 text-white font-medium py-2 rounded transition shadow">Save Product (Live Sync)</button>
+                </form>
+            </div>
+
+            <!-- Inventory Management Table -->
+            <h4 class="text-lg font-semibold mb-3">Manage Inventory (Live Sync Enabled)</h4>
+            <div class="overflow-x-auto bg-neutral-900 border border-neutral-800 rounded-xl shadow-md">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-neutral-800 text-neutral-300">
+                            <th class="p-3">Image</th>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Price</th>
+                            <th class="p-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body" class="divide-y divide-neutral-800"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-amber-900/50 py-6 text-center text-xs text-gray-500">
+        <p>&copy; 2026 GROW FUTURE. All rights reserved. Delivery across Pakistan only. Contact: 0302-8372072</p>
+        <div class="flex justify-center gap-4 mt-3 text-sm">
+            <a href="https://tiktok.com" target="_blank" class="hover:text-amber-500">TikTok</a> | 
+            <a href="https://facebook.com" target="_blank" class="hover:text-amber-500">Facebook</a> | 
+            <a href="https://instagram.com" target="_blank" class="hover:text-amber-500">Instagram</a>
+        </div>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        // Mouse Click Circle Animation Effect
+        window.addEventListener('click', function(e) {
+            const circle = document.createElement('div');
+            circle.className = 'click-circle';
+            circle.style.left = `${e.pageX}px`;
+            circle.style.top = `${e.pageY}px`;
+            document.body.appendChild(circle);
+            setTimeout(() => circle.remove(), 500);
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('header nav button').forEach(btn => {
+                btn.classList.remove('gold-bg', 'text-white');
+                btn.classList.add('bg-neutral-900', 'text-gray-300');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const targetBtn = document.getElementById(`btn-${tabId}`);
+            targetBtn.classList.remove('bg-neutral-900', 'text-gray-300');
+            targetBtn.classList.add('gold-bg', 'text-white');
+
+            if(tabId === 'store') renderStore();
+            if(tabId === 'cart') renderCart();
+            if(tabId === 'admin') renderAdminTable();
+        }
+
+        // Initialize 50 Luxury Demo Items Relevant to Grow Future Brand
+        let products = JSON.parse(localStorage.getItem('grow_future_store_products'));
+        if (!products || products.length === 0) {
+            products = [];
+            const luxuryImages = [
+                "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
+                "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600",
+                "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=600"
+            ];
+            for (let i = 1; i <= 50; i++) {
+                products.push({
+                    name: `Grow Future Luxury Edition Item ${i}`,
+                    price: 3500 + (i * 100),
+                    disc: 3000 + (i * 100),
+                    image: luxuryImages[(i - 1) % luxuryImages.length]
+                });
+            }
+            localStorage.setItem('grow_future_store_products', JSON.stringify(products));
+        }
+
+        let cart = JSON.parse(localStorage.getItem('grow_future_store_cart')) || [];
+
+        function saveProducts() {
+            localStorage.setItem('grow_future_store_products', JSON.stringify(products));
+            initSlider();
+            renderStore();
+        }
+
+        function saveCart() {
+            localStorage.setItem('grow_future_store_cart', JSON.stringify(cart));
+            document.getElementById('cart-count').innerText = cart.reduce((acc, item) => acc + item.qty, 0);
+        }
+
+        // Auto-Scrolling Slider
+        let currentSlide = 0;
+        function initSlider() {
+            const sliderContainer = document.getElementById('slider-container');
+            if(products.length === 0) return;
+            sliderContainer.innerHTML = products.slice(0, 5).map((p, idx) => `
+                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}">
+                    <img src="${p.image}" class="w-full h-full object-cover">
+                    <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 to-transparent p-3 text-left">
+                        <span class="text-xs gold-bg text-white px-2 py-0.5 rounded font-bold">Featured Luxury</span>
+                        <h4 class="text-white font-bold text-sm mt-1">${p.name} - Rs ${p.disc || p.price}</h4>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        setInterval(() => {
+            if(products.length > 0) {
+                currentSlide = (currentSlide + 1) % Math.min(5, products.length);
+                initSlider();
+            }
+        }, 3500);
+
+        // Render Store Front
+        function renderStore() {
+            const grid = document.getElementById('product-grid');
+            const query = document.getElementById('search-box').value.toLowerCase();
+            grid.innerHTML = '';
+
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">No products found.</p>`;
+                return;
+            }
+
+            filtered.forEach((prod, index) => {
+                grid.innerHTML += `
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow flex flex-col justify-between hover:border-amber-600 transition">
+                        <img src="${prod.image}" alt="${prod.name}" class="h-48 w-full object-cover">
+                        <div class="p-4 flex flex-col flex-grow justify-between">
+                            <div>
+                                <h3 class="font-semibold text-sm mb-1">${prod.name}</h3>
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="gold-text font-bold">Rs ${prod.disc || prod.price}</span>
+                                    ${prod.disc ? `<span class="text-gray-500 text-xs line-through">Rs ${prod.price}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="addToCart(${index})" class="bg-neutral-800 hover:bg-neutral-700 text-xs py-2 rounded font-medium transition text-center">Add to Cart</button>
+                                <button onclick="buyNow(${index})" class="gold-bg hover:bg-amber-600 text-white text-xs py-2 rounded font-medium transition text-center">Buy Now</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addToCart(index) {
+            const prod = products[index];
+            const existing = cart.find(item => item.name === prod.name);
+            if(existing) { existing.qty++; } else { cart.push({ ...prod, qty: 1 }); }
+            saveCart();
+            alert("Product added to cart!");
+        }
+
+        function buyNow(index) {
+            addToCart(index);
+            switchTab('cart');
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-items-list');
+            list.innerHTML = '';
+            let subtotal = 0;
+
+            if(cart.length === 0) {
+                list.innerHTML = `<p class="text-center text-gray-500 py-6">Your cart is empty.</p>`;
+                document.getElementById('cart-subtotal').innerText = 'Rs 0';
+                document.getElementById('cart-total').innerText = 'Rs 250';
+                return;
+            }
+
+            cart.forEach((item, idx) => {
+                subtotal += (item.disc || item.price) * item.qty;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center py-3">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.image}" class="w-12 h-12 object-cover rounded">
+                            <div>
+                                <h5 class="text-sm font-medium">${item.name}</h5>
+                                <p class="text-xs gold-text">Rs ${item.disc || item.price} x ${item.qty}</p>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${idx})" class="text-red-500 text-xs hover:underline">Remove</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('cart-subtotal').innerText = `Rs ${subtotal}`;
+            document.getElementById('cart-total').innerText = `Rs ${subtotal > 0 ? subtotal + 250 : 0}`;
+        }
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            saveCart();
+            renderCart();
+        }
+
+        function checkoutOrder(e) {
+            e.preventDefault();
+            if(cart.length === 0) { alert("Cart is empty!"); return; }
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const address = document.getElementById('cust-address').value;
+
+            const orderDetails = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+            const total = document.getElementById('cart-total').innerText;
+
+            const whatsappMsg = encodeURIComponent(`New Order for GROW FUTURE:\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\nItems: ${orderDetails}\nTotal: ${total} (COD - Pakistan Only)`);
+            window.open(`https://wa.me/923028372072?text=${whatsappMsg}`, '_blank');
+            
+            cart = [];
+            saveCart();
+            renderCart();
+            alert("Order placed successfully via WhatsApp confirmation!");
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = '';
+
+            products.forEach((prod, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-neutral-800 transition">
+                        <td class="p-3"><img src="${prod.image}" class="w-10 h-10 object-cover rounded"></td>
+                        <td class="p-3 text-xs font-medium">${prod.name}</td>
+                        <td class="p-3 text-xs gold-text">Rs ${prod.disc || prod.price}</td>
+                        <td class="p-3 text-center space-x-2">
+                            <button onclick="editProduct(${index})" class="bg-amber-700 px-2 py-1 rounded text-xs text-white">Edit</button>
+                            <button onclick="deleteProduct(${index})" class="bg-red-700 px-2 py-1 rounded text-xs text-white">Del</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('prod-name').value;
+            const price = Number(document.getElementById('prod-price').value);
+            const disc = Number(document.getElementById('prod-disc').value) || null;
+            const fileInput = document.getElementById('prod-image');
+            const editIndex = document.getElementById('edit-index').value;
+
+            const processSave = (imageUrl) => {
+                if(editIndex === "") {
+                    products.unshift({ name, price, disc, image: imageUrl });
+                } else {
+                    products[editIndex] = { name, price, disc, image: imageUrl || products[editIndex].image };
+                    document.getElementById('edit-index').value = "";
+                    document.getElementById('form-title').innerText = "Add New Product";
+                }
+                saveProducts();
+                document.getElementById('product-form').reset();
+                renderAdminTable();
+                switchTab('store');
+            };
+
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { processSave(e.target.result); };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                processSave(editIndex !== "" ? products[editIndex].image : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600");
+            }
+        }
+
+        function editProduct(index) {
+            const p = products[index];
+            document.getElementById('prod-name').value = p.name;
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-disc').value = p.disc || '';
+            document.getElementById('edit-index').value = index;
+            document.getElementById('form-title').innerText = "Edit Product";
+            switchTab('admin');
+        }
+
+        function deleteProduct(index) {
+            if(confirm("Delete this product?")) {
+                products.splice(index, 1);
+                saveProducts();
+                renderAdminTable();
+            }
+        }
+
+        // Initial Calls
+        saveCart();
+        initSlider();
+        renderStore();
+    </script>
+</body>
+</html>
